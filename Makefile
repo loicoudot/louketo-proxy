@@ -36,7 +36,7 @@ static: golang
 container-build: docker-build
 docker-build:
 	@echo "--> Compiling the project, inside a temporary container"
-	$(eval IMAGE=$(shell uuidgen))
+	$(eval IMAGE=$(shell uuidgen | tr [:upper:] [:lower:]))
 	${CONTAINER_TOOL} build --target build-env -t ${IMAGE} .
 	${CONTAINER_TOOL} run --rm ${IMAGE} /bin/cat /louketo-proxy > bin/louketo-proxy
 	${CONTAINER_TOOL} rmi ${IMAGE}
