@@ -100,6 +100,11 @@ func (r *oauthProxy) redirectToAuthorization(w http.ResponseWriter, req *http.Re
 	uuid := r.writeStateParameterCookie(req, w)
 	authQuery := fmt.Sprintf("?state=%s", uuid)
 
+	hint := req.URL.Query().Get("kc_idp_hint")
+	if hint != "" {
+		authQuery += fmt.Sprintf("&kc_idp_hint=%s", hint)
+	}
+
 	// step: if verification is switched off, we can't authorization
 	if r.config.SkipTokenVerification {
 		r.log.Error("refusing to redirection to authorization endpoint, skip token verification switched on")
