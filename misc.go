@@ -89,9 +89,36 @@ func (r *oauthProxy) redirectToURL(url string, w http.ResponseWriter, req *http.
 	return r.revokeProxy(w, req)
 }
 
+// isAjax checks if a request is an ajax request
+func isAjax(req *http.Request) bool {
+	acceptValues := req.Header.Values("Accept")
+	const ajaxReq = "application/json"
+	// Iterate over multiple Accept headers, i.e.
+	// Accept: application/json
+	// Accept: text/plain
+	for _, mimeTypes := range acceptValues {
+		// Iterate over multiple mimetypes in a single header, i.e.
+		// Accept: application/json, text/plain, */*
+		for _, mimeType := range strings.Split(mimeTypes, ",") {
+			mimeType = strings.TrimSpace(mimeType)
+			if mimeType == ajaxReq {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // redirectToAuthorization redirects the user to authorization handler
-func (r *oauthProxy) redirectToAuthorization(w http.ResponseWriter, req *http.Request) context.Context {
+func (r *oauthProxy) aaaaredirectToAuthorization(w http.ResponseWriter, req *http.Request) context.Context {
 	if r.config.NoRedirects {
+		w.WriteHeader(http.StatusUnauthorized)
+		return r.revokeProxy(w, req)
+	}
+
+	// HVS: Traite les requêtes AJAX
+	if isAjax(req) {
+		w.Header().Set("x-hvs-authorization", "denied")
 		w.WriteHeader(http.StatusUnauthorized)
 		return r.revokeProxy(w, req)
 	}

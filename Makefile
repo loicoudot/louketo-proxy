@@ -1,5 +1,5 @@
-NAME=louketo-proxy
-AUTHOR=louketo
+NAME=hvs-louketo
+AUTHOR=loicoudot
 REGISTRY=docker.io
 CONTAINER_TOOL=$(shell command -v podman 2>/dev/null || command -v docker)
 ROOT_DIR=${PWD}
